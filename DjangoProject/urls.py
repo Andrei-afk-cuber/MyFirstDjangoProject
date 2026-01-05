@@ -22,5 +22,7 @@ from vacancies import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', views.users),
+    path('users/<int:user_id>', views.get_user),
     path('vacancies/', views.vacancies),
+    path('vacancies/<int:vacancy_id>/', views.get_vacancy),
 ]

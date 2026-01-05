@@ -18,6 +18,20 @@ def vacancies(request):
 
         return JsonResponse(response, safe=False)
 
+# Craete view for get vacancy by id
+def get_vacancy(request, vacancy_id):
+    if request.method == "GET":
+        # get one vacancy by id (ot pk (universal))
+        try:
+            vacancy = Vacancy.objects.get(pk=vacancy_id)
+        except Vacancy.DoesNotExist:
+            return JsonResponse({"error": "Vacancy not found"}, status=404)
+
+        return JsonResponse({
+            'id': vacancy.id,
+            'text': vacancy.text
+        })
+
 # view for get
 def users(request):
     if request.method == "GET":
@@ -33,3 +47,17 @@ def users(request):
             })
 
         return JsonResponse(response, safe=False)
+
+# view for get user by id
+def get_user(request, user_id):
+    if request.method == "GET":
+        try:
+            user = User.objects.get(pk=user_id)
+        except:
+            return JsonResponse({"error": "User not found"}, status=404)
+
+        return JsonResponse({
+            "id": user.id,
+            "name": user.name,
+            "age": user.age,
+        })
