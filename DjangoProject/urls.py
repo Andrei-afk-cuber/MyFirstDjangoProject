@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from vacancies import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('users/', views.users),
+    path('vacancies/', views.vacancies),
 ]
