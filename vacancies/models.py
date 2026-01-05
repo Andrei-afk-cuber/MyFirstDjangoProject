@@ -1,3 +1,8 @@
 from django.db import models
 
-# Create your models here.
+class Vacancy(models.Model):
+    text = models.CharField(max_length=2000)
+
+class User(models.Model):
+    name = models.CharField(max_length=200)
+    age = models.IntegerField()
