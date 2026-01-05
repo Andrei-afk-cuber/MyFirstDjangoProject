@@ -6,7 +6,7 @@ from vacancies.models import Vacancy, User
 # view for vacancies
 def vacancies(request):
     if request.method == "GET":
-        vacancies = Vacancy.object.all()
+        vacancies = Vacancy.objects.all()
 
         response = []
 
