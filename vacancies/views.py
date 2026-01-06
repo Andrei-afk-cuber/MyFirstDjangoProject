@@ -8,8 +8,13 @@ def vacancies(request):
     if request.method == "GET":
         vacancies = Vacancy.objects.all()
 
-        response = []
+        # get 'text' query parameter
+        search_text = request.GET.get('text', None)
 
+        if search_text:
+            vacancies = vacancies.filter(text=search_text)
+
+        response = []
         for vacancy in vacancies:
             response.append({
                 "id": vacancy.id,
@@ -37,8 +42,16 @@ def users(request):
     if request.method == "GET":
         users = User.objects.all()
 
-        response = []
+        name = request.GET.get('name', None)
+        age = request.GET.get('age', None)
 
+        if name:
+            users = users.filter(name=name)
+
+        if age:
+            users = users.filter(age=age)
+
+        response = []
         for user in users:
             response.append({
                 "id": user.id,
