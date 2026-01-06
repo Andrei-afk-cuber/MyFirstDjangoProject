@@ -17,12 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from vacancies import views
+from vacancies import views as vacancies_views
+from users import views as users_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', views.users),
-    path('users/<int:user_id>', views.get_user),
-    path('vacancies/', views.vacancies),
-    path('vacancies/<int:vacancy_id>/', views.get_vacancy),
+    path('users/', users_views.users),
+    path('users/<int:id>', users_views.get_user),
+    path('vacancies/', vacancies_views.vacancies),
+    path('vacancies/<int:vacancy_id>/', vacancies_views.get_vacancy),
 ]
