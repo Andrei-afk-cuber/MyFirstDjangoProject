@@ -2,15 +2,18 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views import View
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import DetailView
 
 from vacancies.models import Vacancy
 
-# view for vacancies
-# use decorator for off csrf
-@csrf_exempt
-def vacancies(request):
-    if request.method == "GET":
+# class for vacancies
+@method_decorator(csrf_exempt, name='dispatch')
+class VacancyView(View):
+    # GET processing
+    def get(self, request):
         vacancies = Vacancy.objects.all()
 
         # get 'text' query parameter
@@ -28,7 +31,7 @@ def vacancies(request):
 
         return JsonResponse(response, safe=False)
 
-    elif request.method == "POST":
+    def post(self, request):
         vacancy_data = json.loads(request.body)
 
         vacancy = Vacancy()
@@ -40,17 +43,15 @@ def vacancies(request):
             "text": vacancy.text
         })
 
-# view for get vacancy by id
-def get_vacancy(request, vacancy_id):
-    if request.method == "GET":
-        # get one vacancy by id (ot pk (universal))
-        try:
-            vacancy = Vacancy.objects.get(pk=vacancy_id)
-        except Vacancy.DoesNotExist:
-            return JsonResponse({"error": "Vacancy not found"}, status=404)
+# class for detail vacancy view
+class VacancyDetailView(DetailView):
+    model = Vacancy
+
+    # GET processing
+    def get(self, *args, **kwargs):
+        vacancy = self.get_object()
 
         return JsonResponse({
             'id': vacancy.id,
             'text': vacancy.text
         })
-
