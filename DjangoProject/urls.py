@@ -22,8 +22,8 @@ from users import views as users_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('vacancies/', vacancies_views.VacancyView.as_view()),
+    path('vacancies/<int:pk>', vacancies_views.VacancyDetailView.as_view()),
     path('users/', users_views.UserView.as_view()),
     path('users/<int:pk>', users_views.UserDetailView.as_view()),
-    path('vacancies/', vacancies_views.VacancyView.as_view()),
-    path('vacancies/<int:pk>/', vacancies_views.VacancyDetailView.as_view()),
 ]
