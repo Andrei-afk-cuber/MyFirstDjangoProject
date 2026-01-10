@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Vacancy(models.Model):
     STATUS = [
@@ -10,4 +11,7 @@ class Vacancy(models.Model):
     text = models.CharField(max_length=2000)
     slug = models.SlugField(max_length=50)
     status = models.CharField(max_length=6, choices=STATUS, default="draft")
-    # created = models.DateField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.slug
