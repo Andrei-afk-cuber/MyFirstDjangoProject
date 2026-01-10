@@ -18,12 +18,9 @@ from django.contrib import admin
 from django.urls import path
 
 from vacancies import views as vacancies_views
-from users import views as users_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('vacancies/', vacancies_views.VacancyView.as_view()),
     path('vacancies/<int:pk>', vacancies_views.VacancyDetailView.as_view()),
-    path('users/', users_views.UserView.as_view()),
-    path('users/<int:pk>', users_views.UserDetailView.as_view()),
 ]
