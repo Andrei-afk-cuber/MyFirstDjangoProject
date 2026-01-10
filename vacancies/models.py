@@ -13,7 +13,7 @@ class Vacancy(models.Model):
     slug = models.SlugField(max_length=50)
     status = models.CharField(max_length=6, choices=STATUS, default="draft")
     created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.slug
