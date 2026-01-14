@@ -1,5 +1,6 @@
 import json
 
+from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views import View
@@ -7,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 
+from DjangoProject import settings
 from vacancies.models import Vacancy, Skill
 
 
@@ -29,12 +31,25 @@ class VacancyView(ListView):
 
         self.object_list = self.object_list.order_by("text")
 
-        response = []
-        for vacancy in self.object_list:
-            response.append({
+        # pagination
+        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGES)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+
+        vacancies = []
+        for vacancy in page_obj:
+            vacancies.append({
                 "id": vacancy.id,
                 "text": vacancy.text
             })
+
+        response = {
+            "items": vacancies,
+            "num_pages": paginator.num_pages,
+            "ent_page": page_number,
+            "total": paginator.count
+        }
 
         return JsonResponse(response, safe=False)
 
