@@ -27,6 +27,8 @@ class VacancyView(ListView):
         if search_text:
             self.object_list = self.object_list.filter(text=search_text)
 
+        self.object_list = self.object_list.order_by("text")
+
         response = []
         for vacancy in self.object_list:
             response.append({
