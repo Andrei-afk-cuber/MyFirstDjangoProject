@@ -8,4 +8,5 @@ urlpatterns = [
     path('create/', vacancies_views.VacancyCreateView.as_view()),
     path('<int:pk>/update/', vacancies_views.VacancyUpdateView.as_view()),
     path('<int:pk>/delete/', vacancies_views.VacancyDeleteView.as_view()),
+    path('by_user/', vacancies_views.UserVacancyDetailView.as_view()),
 ]

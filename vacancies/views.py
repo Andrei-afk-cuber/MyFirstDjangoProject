@@ -1,8 +1,11 @@
 import json
 
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db.models import Count, Avg
+from django.db.models.fields.json import JSONExact
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -36,12 +39,15 @@ class VacancyView(ListView):
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
-
         vacancies = []
         for vacancy in page_obj:
             vacancies.append({
                 "id": vacancy.id,
-                "text": vacancy.text
+                "text": vacancy.text,
+                "slug": vacancy.slug,
+                "status": vacancy.status,
+                "skills": list(map(str, vacancy.skills.all())),
+                "user_id": vacancy.user.id
             })
 
         response = {
@@ -68,6 +74,8 @@ class VacancyDetailView(DetailView):
             'status': vacancy.status,
             'created': vacancy.created,
             'user': vacancy.user_id,
+            "skills": list(map(str, vacancy.skills.all())),
+            "user_id": vacancy.user.id
         })
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -78,18 +86,31 @@ class VacancyCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         vacancy_data = json.loads(request.body)
 
+        # return obj or 404
+        user = get_object_or_404(User, pk=vacancy_data["user_id"])
+
         vacancy = Vacancy.objects.create(
-            user_id=vacancy_data['user_id'],
+            user=user,
             slug=vacancy_data['slug'],
             text=vacancy_data['text'],
             status=vacancy_data['status']
         )
-        vacancy.text = vacancy_data['text']
+
+        for skill in vacancy_data['skills']:
+            skill_obj, created = Skill.objects.get_or_create(name=skill, defaults={
+                "is_active": True
+            })
+            vacancy.skills.add(skill_obj)
 
         vacancy.save()
 
         return JsonResponse({
-            "text": vacancy.text
+            "id": vacancy.id,
+            "text": vacancy.text,
+            "slug": vacancy.slug,
+            "status": vacancy.status,
+            "created": vacancy.created,
+            "user": vacancy.user_id
         })
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -134,3 +155,27 @@ class VacancyDeleteView(DeleteView):
         return JsonResponse({
             "status": "ok"
         }, status=200)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserVacancyDetailView(View):
+    def get(self, request):
+        user_qs = User.objects.annotate(vacancies=Count('vacancy'))
+
+        paginator = Paginator(user_qs, settings.TOTAL_ON_PAGES)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        users = []
+        for user in page_obj:
+            users.append({
+                "id": user.id,
+                "name": user.username,
+                "vacancies": user.vacancies
+            })
+
+        return JsonResponse({
+            "items": users,
+            "total": paginator.count,
+            "num_pages": paginator.num_pages,
+            "avg": user_qs.aggregate(avg=Avg('vacancies'))["avg"]
+        })
